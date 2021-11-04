@@ -7,8 +7,6 @@ from {{cookiecutter.app_name}}.extensions import db
 from {{cookiecutter.app_name}}.extensions import jwt
 from {{cookiecutter.app_name}}.extensions import migrate
 
-{%- if cookiecutter.use_celery == "yes"%}, celery{% endif%}
-
 
 def create_app(testing=False):
     """Application factory, used to create application"""
@@ -22,9 +20,6 @@ def create_app(testing=False):
     configure_cli(app)
     configure_apispec(app)
     register_blueprints(app)
-{%- if cookiecutter.use_celery == "yes" %}
-    init_celery(app)
-{%- endif %}
 
     return app
 
@@ -64,20 +59,3 @@ def register_blueprints(app):
     """Register all blueprints for application"""
     app.register_blueprint(auth.views.blueprint)
     app.register_blueprint(api.views.blueprint)
-{%- if cookiecutter.use_celery == "yes" %}
-
-
-def init_celery(app=None):
-    app = app or create_app()
-    celery.conf.update(app.config.get("CELERY", {}))
-
-    class ContextTask(celery.Task):
-        """Make celery tasks work with Flask app context"""
-
-        def __call__(self, *args, **kwargs):
-            with app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery.Task = ContextTask
-    return celery
-{%- endif %}

@@ -5,5 +5,4 @@ default_context:
     admin_user_username: "{{ cookiecutter.admin_user_username }}"
     admin_user_email: "{{ cookiecutter.admin_user_email }}"
     admin_user_password: "{{ cookiecutter.admin_user_password }}"
-    use_celery: "{{ cookiecutter.use_celery }}"
     wsgi_server: "{{ cookiecutter.wsgi_server }}"
