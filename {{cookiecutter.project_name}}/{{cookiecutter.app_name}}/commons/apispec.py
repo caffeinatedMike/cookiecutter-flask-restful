@@ -5,8 +5,8 @@ from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_webframeworks.flask import FlaskPlugin
 
 
-class FlaskRestfulPlugin(FlaskPlugin):
-    """Small plugin override to handle flask-restful resources"""
+class FlaskMethodViewPlugin(FlaskPlugin):
+    """Small plugin override to handle flask.views.MethodView resources"""
 
     @staticmethod
     def _rule_for_view(view, app=None):
@@ -24,7 +24,7 @@ class FlaskRestfulPlugin(FlaskPlugin):
             raise APISpecError("Could not find endpoint for view {0}".format(view))
 
         # WARNING: Assume 1 rule per view function for now
-        rule = app.url_map._rules_by_endpoint[endpoint][0]
+        rule = app.url_map._rules_by_endpoint[endpoint][0]  # noqa
         return rule
 
 
@@ -51,7 +51,7 @@ class APISpecExt:
             title=app.config["APISPEC_TITLE"],
             version=app.config["APISPEC_VERSION"],
             openapi_version=app.config["OPENAPI_VERSION"],
-            plugins=[MarshmallowPlugin(), FlaskRestfulPlugin()],
+            plugins=[MarshmallowPlugin(), FlaskMethodViewPlugin()],
             **kwargs
         )
 
@@ -62,26 +62,30 @@ class APISpecExt:
             url_prefix=app.config["SWAGGER_URL_PREFIX"],
         )
 
-        blueprint.add_url_rule(app.config["SWAGGER_JSON_URL"], "swagger_json", self.swagger_json)
+        blueprint.add_url_rule(app.config["SWAGGER_JSON_URL"], "swagger_spec", self.swagger_spec)
         blueprint.add_url_rule(app.config["SWAGGER_UI_URL"], "swagger_ui", self.swagger_ui)
-        blueprint.add_url_rule(app.config["OPENAPI_YAML_URL"], "openapi_yaml", self.openapi_yaml)
+        blueprint.add_url_rule(app.config["OPENAPI_YAML_URL"], "openapi_spec", self.openapi_spec)
         blueprint.add_url_rule(app.config["REDOC_UI_URL"], "redoc_ui", self.redoc_ui)
 
         app.register_blueprint(blueprint)
 
-    def swagger_json(self):
+    def swagger_spec(self):
         return jsonify(self.spec.to_dict())
 
     def swagger_ui(self):
         return render_template("swagger.j2")
 
-    def openapi_yaml(self):
+    def openapi_spec(self):
         # Manually inject ReDoc's Authentication legend, then remove it
         self.spec.tag(
-            {"name": "authentication", "x-displayName": "Authentication", "description": "<SecurityDefinitions />"}
+            {
+                "name": "authentication",
+                "x-displayName": "Authentication",
+                "description": "<SecurityDefinitions />"
+            }
         )
         redoc_spec = self.spec.to_yaml()
-        self.spec._tags.pop(0)
+        self.spec._tags.pop(0)  # noqa
         return redoc_spec
 
     def redoc_ui(self):
