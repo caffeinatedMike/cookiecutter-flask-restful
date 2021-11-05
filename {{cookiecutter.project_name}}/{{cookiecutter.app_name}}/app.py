@@ -1,11 +1,6 @@
 from flask import Flask
-from {{cookiecutter.app_name}} import api
-from {{cookiecutter.app_name}} import auth
-from {{cookiecutter.app_name}} import manage
-from {{cookiecutter.app_name}}.extensions import apispec
-from {{cookiecutter.app_name}}.extensions import db
-from {{cookiecutter.app_name}}.extensions import jwt
-from {{cookiecutter.app_name}}.extensions import migrate
+from {{cookiecutter.app_name}} import api, auth, manage
+from {{cookiecutter.app_name}}.extensions import apispec, db, jwt, migrate
 
 
 def create_app(testing=False):
@@ -33,14 +28,17 @@ def configure_extensions(app):
 
 def configure_cli(app):
     """Configure Flask 2.0's cli for easy entity management"""
-    app.cli.add_command(manage.init)
+    app.cli.add_command(manage.create_admin)
 
 
 def configure_apispec(app):
     """Configure APISpec for swagger support"""
-    apispec.init_app(app, security=[{"jwt": []}])
+    apispec.init_app(app)
     apispec.spec.components.security_scheme(
-        "jwt", {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}
+        "TokenAuth", {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}
+    )
+    apispec.spec.components.security_scheme(
+        "ApiKeyAuth", {"type": "apiKey", "in": "header", "name": "X-API-Key"}
     )
     apispec.spec.components.schema(
         "PaginatedResult",
