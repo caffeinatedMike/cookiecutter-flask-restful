@@ -1,5 +1,5 @@
 from flask import request
-from flask_restful import Resource
+from flask.views import MethodView
 from flask_jwt_extended import jwt_required
 from {{cookiecutter.app_name}}.api.schemas import UserSchema
 from {{cookiecutter.app_name}}.models import User
@@ -7,7 +7,7 @@ from {{cookiecutter.app_name}}.extensions import db
 from {{cookiecutter.app_name}}.commons.pagination import paginate
 
 
-class UserResource(Resource):
+class UserResource(MethodView):
     """Single object resource
 
     ---
@@ -107,7 +107,7 @@ class UserResource(Resource):
         return {"msg": "user deleted"}
 
 
-class UserList(Resource):
+class UserList(MethodView):
     """Creation and get_all
 
     ---

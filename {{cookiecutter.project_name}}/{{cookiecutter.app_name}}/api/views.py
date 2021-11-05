@@ -1,5 +1,4 @@
 from flask import Blueprint, current_app, jsonify
-from flask_restful import Api
 from marshmallow import ValidationError
 from {{cookiecutter.app_name}}.extensions import apispec
 from {{cookiecutter.app_name}}.api.resources import UserResource, UserList
@@ -7,11 +6,14 @@ from {{cookiecutter.app_name}}.api.schemas import UserSchema
 
 
 blueprint = Blueprint("api", __name__, url_prefix="/api/v1")
-api = Api(blueprint)
 
 
-api.add_resource(UserResource, "/users/<int:user_id>", endpoint="user_by_id")
-api.add_resource(UserList, "/users", endpoint="users")
+blueprint.add_url_rule(
+    "/users/<int:user_id>",
+    view_func=UserResource.as_view("user_by_id"),
+    endpoint="user_by_id"
+)
+blueprint.add_url_rule("/users", view_func=UserList.as_view("users"), endpoint="users")
 
 
 @blueprint.before_app_first_request
