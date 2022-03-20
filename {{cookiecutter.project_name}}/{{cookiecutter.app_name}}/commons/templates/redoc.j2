@@ -16,7 +16,7 @@
   </head>
   <body>{% raw %}
     <!-- See https://github.com/Redocly/redoc for available options-->
-    <redoc no-auto-auth required-props-first spec-url="{{ url_for('swagger.openapi_yaml') }}"></redoc>
+    <redoc no-auto-auth required-props-first spec-url="{{ url_for('swagger.openapi_spec') }}"></redoc>
     <script src="//cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>{% endraw %}
   </body>
 </html>
